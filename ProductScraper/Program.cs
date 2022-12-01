@@ -7,6 +7,6 @@ public class Program
     public static void Main(string[] args)
     {
         Scraper scraper = new Scraper();
-        scraper.ScrapeProducts();
+        scraper.ParseHtmlDocument();
     }
 }
