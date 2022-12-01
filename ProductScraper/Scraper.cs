@@ -7,7 +7,9 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace ProductScraper
 {
@@ -67,17 +69,52 @@ namespace ProductScraper
 
         private string ParseProductName(HtmlNode divItemNode)
         {
-            throw new NotImplementedException();
+            var firstImgNode = divItemNode.SelectSingleNode(".//img");
+            if(firstImgNode == null)
+            {
+                Console.WriteLine("No product name found for item node on Line " + divItemNode.Line);
+                return "";
+            }
+            else
+            {
+                var productNameNode = firstImgNode.Attributes["alt"];
+                if (productNameNode == null)
+                {
+                    Console.WriteLine("No product name found for item node on Line " + divItemNode.Line);
+                    return "";
+                }
+                else
+                {
+                    string productName = productNameNode.Value;
+                    Console.WriteLine(productName);
+                    return productName;
+                }
+            }
         }
 
         private double ParsePrice(HtmlNode divItemNode)
         {
-            throw new NotImplementedException();
+            var spanDollarsNode = divItemNode.SelectSingleNode(".//span[contains(@class, 'dollars')]");
+            var spanCentsNode = divItemNode.SelectSingleNode(".//span[contains(@class, 'cents')]");
+            if (spanDollarsNode == null || spanCentsNode == null)
+            {
+                Console.WriteLine("No product name found for item node on Line " + divItemNode.Line);
+                return -1;
+            }
+            else
+            {
+                //Regex rgx = new Regex(@"\D");
+                //string dollars = rgx.Replace(spanDollarsNode.InnerHtml, "");
+                string dollars = spanDollarsNode.InnerHtml.Replace(",", "");             
+                string cents = spanCentsNode.InnerHtml;
+                Console.WriteLine(dollars + cents, CultureInfo.InvariantCulture);
+                return double.Parse(dollars + cents, CultureInfo.InvariantCulture);
+            }
         }
 
         private double ParseRating(HtmlNode divItemNode)
         {
-            var ratingNode = divItemNode.Attributes["rating"].Value;
+            var ratingNode = divItemNode.Attributes["rating"];
             if (ratingNode == null)
             {
                 Console.WriteLine("No rating found for item node on Line " + divItemNode.Line);
@@ -85,7 +122,7 @@ namespace ProductScraper
             }
             else
             {
-                double rating = double.Parse(ratingNode, CultureInfo.InvariantCulture);
+                double rating = double.Parse(ratingNode.Value, CultureInfo.InvariantCulture);
 
                 // The ratings must be normalized but there is no indication what scales can be used
                 // and how to differentiate between them, so I did the following implementation.
@@ -98,6 +135,7 @@ namespace ProductScraper
                 // If the rating is 8 then it will become 4/5.
                 else if (rating > 5)
                     rating = rating / 2;
+                Console.WriteLine(rating);
                 return rating;
             }
         }
@@ -112,6 +150,7 @@ namespace ProductScraper
             else
                 return true;
         }
+
         private void ListParseErrors(IEnumerable<HtmlParseError> errors)
         {
             Console.WriteLine("Error when parsing HTML file on lines:");
