@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,15 +9,26 @@ namespace ProductScraper.Models
 {
     internal class Product
     {
-        private string _name;
-        private double _price;
-        private double _rating;
+        [JsonProperty("productName")]
+        private string ProductName { get; set; }
+        [JsonProperty("price")]
+        private double Price { get; set; }
+        [JsonProperty("rating")]
+        private double Rating { get; set; }
 
-        public Product(string name, double price, double rating)
+        public Product()
         {
-            _name = name;
-            _price = price;
-            _rating = rating;
+
+        }
+        public Product(string ProductName, double Price, double Rating)
+        {
+            this.ProductName = ProductName;
+            this.Price = Price;
+            this.Rating = Rating;
+        }
+        public override string ToString()
+        {
+            return "\nProduct name: " + ProductName + "\nPrice: " + Price + "\nRating: " + Rating; 
         }
     }
 }

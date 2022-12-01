@@ -1,8 +1,11 @@
 ﻿using HtmlAgilityPack;
+using Newtonsoft.Json;
+using ProductScraper.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ProductScraper
@@ -31,16 +34,10 @@ namespace ProductScraper
                 return;
             else
             {
-                Console.WriteLine("Success");
-                //if (htmlDoc.DocumentNode != null)
-                //{
-                //    HtmlAgilityPack.HtmlNode bodyNode = htmlDoc.DocumentNode.SelectSingleNode("//body");
-
-                //    if (bodyNode != null)
-                //    {
-                //        // Do something with bodyNode
-                //    }
-                //}
+                var list = new List<Product>();
+                list.Add(new Product("name1", 9.99, 4.1));
+                list.Add(new Product("name2", 1.11, 2.9));
+                list.ForEach(prod => Console.WriteLine(JsonConvert.SerializeObject(prod, Formatting.Indented)));
             }
         }
 
