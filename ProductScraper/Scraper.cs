@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace ProductScraper
 {
@@ -56,14 +57,17 @@ namespace ProductScraper
                         double rating = ParseRating(divItemNode);
                         double price = ParsePrice(divItemNode);
                         string productName = ParseProductName(divItemNode);
+                        if (rating == -1 || price == -1 || productName == "")
+                            return;
+                        else
+                        {
+                            Product product = new Product(productName, price, rating);
+                            parsedProductsList.Add(product);
+                        }
                     }
+                    string output = JsonConvert.SerializeObject(parsedProductsList, Formatting.Indented);
+                    Console.WriteLine(output);
                 }
-
-                // Console.WriteLine("\n \n \n" + divItemNode.OuterHtml);
-                //var list = new List<Product>();
-                //list.Add(new Product("name1", 9.99, 4.1));
-                //list.Add(new Product("name2", 1.11, 2.9));
-                //JsonConvert.SerializeObject(list, Formatting.Indented);
             }
         }
 
@@ -85,8 +89,7 @@ namespace ProductScraper
                 }
                 else
                 {
-                    string productName = productNameNode.Value;
-                    Console.WriteLine(productName);
+                    string productName = HtmlEntity.DeEntitize(productNameNode.Value);
                     return productName;
                 }
             }
@@ -107,7 +110,6 @@ namespace ProductScraper
                 //string dollars = rgx.Replace(spanDollarsNode.InnerHtml, "");
                 string dollars = spanDollarsNode.InnerHtml.Replace(",", "");             
                 string cents = spanCentsNode.InnerHtml;
-                Console.WriteLine(dollars + cents, CultureInfo.InvariantCulture);
                 return double.Parse(dollars + cents, CultureInfo.InvariantCulture);
             }
         }
@@ -135,7 +137,6 @@ namespace ProductScraper
                 // If the rating is 8 then it will become 4/5.
                 else if (rating > 5)
                     rating = rating / 2;
-                Console.WriteLine(rating);
                 return rating;
             }
         }
