@@ -10,15 +10,13 @@ namespace ProductScraper.Models
         private double Price { get; set; }
         [JsonProperty("rating")]
         private double Rating { get; set; }
+
+        // Doubles as strings:
         //private double Price { get; set; }
         //public string FormattedPrice => $"{this.Price}";
         //private double Rating { get; set; }
         //public string FormattedRating => $"{this.Rating}";
 
-        public Product()
-        {
-
-        }
         public Product(string ProductName, double Price, double Rating)
         {
             this.ProductName = ProductName;
