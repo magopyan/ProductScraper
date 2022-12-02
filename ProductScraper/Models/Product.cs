@@ -6,12 +6,14 @@ namespace ProductScraper.Models
     {
         [JsonProperty("productName")]
         private string ProductName { get; set; }
-
         [JsonProperty("price")]
         private double Price { get; set; }
-
         [JsonProperty("rating")]
         private double Rating { get; set; }
+        //private double Price { get; set; }
+        //public string FormattedPrice => $"{this.Price}";
+        //private double Rating { get; set; }
+        //public string FormattedRating => $"{this.Rating}";
 
         public Product()
         {

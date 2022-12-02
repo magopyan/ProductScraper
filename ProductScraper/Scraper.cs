@@ -12,9 +12,8 @@ namespace ProductScraper
         {
         }
 
-        public void ParseHtmlDocument()
+        public void ParseHtmlDocument(string htmlFilePath)
         {
-            var htmlFilePath = @"../../../Excerpts/products.html";
             var htmlDoc = new HtmlDocument();
             try
             {
@@ -114,7 +113,7 @@ namespace ProductScraper
                 //Regex rgx = new Regex(@"\D");
                 //string dollars = rgx.Replace(spanDollarsNode.InnerHtml, "");
                 string dollars = spanDollarsNode.InnerHtml.Replace(",", "");             
-                string cents = spanCentsNode.InnerHtml;
+                string cents = spanCentsNode.InnerHtml.Replace(",", ".");
                 double price;
                 if (double.TryParse(dollars + cents, NumberStyles.Number, CultureInfo.InvariantCulture, out price))
                     return price;
