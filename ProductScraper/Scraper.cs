@@ -1,16 +1,8 @@
 ﻿using HtmlAgilityPack;
 using Newtonsoft.Json;
 using ProductScraper.Models;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using JsonSerializer = System.Text.Json.JsonSerializer;
+
 
 namespace ProductScraper
 {
@@ -19,6 +11,7 @@ namespace ProductScraper
         public Scraper()
         {
         }
+
         public void ParseHtmlDocument()
         {
             var htmlFilePath = @"../../../Excerpts/products.html";
@@ -32,12 +25,18 @@ namespace ProductScraper
                 Console.WriteLine("Error: Directory " + htmlFilePath + " not found.");
                 return;
             }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("Error: File " + htmlFilePath + " not found in directory.");
+                return;
+            }
 
             if (CanParseHtmlDocument(htmlDoc.ParseErrors))
                 ScrapeProducts(htmlDoc);
             else
                 return;
         }
+
 
         private void ScrapeProducts(HtmlDocument doc)
         {
@@ -57,8 +56,9 @@ namespace ProductScraper
                         double rating = ParseRating(divItemNode);
                         double price = ParsePrice(divItemNode);
                         string productName = ParseProductName(divItemNode);
+
                         if (rating == -1 || price == -1 || productName == "")
-                            return;
+                            continue;
                         else
                         {
                             Product product = new Product(productName, price, rating);
@@ -67,6 +67,11 @@ namespace ProductScraper
                     }
                     string output = JsonConvert.SerializeObject(parsedProductsList, Formatting.Indented);
                     Console.WriteLine(output);
+                }
+                else
+                {
+                    Console.WriteLine("No products found.");
+                    return;
                 }
             }
         }
@@ -101,7 +106,7 @@ namespace ProductScraper
             var spanCentsNode = divItemNode.SelectSingleNode(".//span[contains(@class, 'cents')]");
             if (spanDollarsNode == null || spanCentsNode == null)
             {
-                Console.WriteLine("No product name found for item node on Line " + divItemNode.Line);
+                Console.WriteLine("No price found for item node on Line " + divItemNode.Line);
                 return -1;
             }
             else
@@ -110,7 +115,14 @@ namespace ProductScraper
                 //string dollars = rgx.Replace(spanDollarsNode.InnerHtml, "");
                 string dollars = spanDollarsNode.InnerHtml.Replace(",", "");             
                 string cents = spanCentsNode.InnerHtml;
-                return double.Parse(dollars + cents, CultureInfo.InvariantCulture);
+                double price;
+                if (double.TryParse(dollars + cents, NumberStyles.Number, CultureInfo.InvariantCulture, out price))
+                    return price;
+                else
+                {
+                    Console.WriteLine("Invalid price format for item node on Line " + divItemNode.Line);
+                    return -1;
+                }
             }
         }
 

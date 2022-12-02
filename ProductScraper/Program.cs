@@ -1,6 +1,4 @@
-﻿using HtmlAgilityPack;
-using ProductScraper;
-using System.Runtime.CompilerServices;
+﻿using ProductScraper;
 
 public class Program
 {
